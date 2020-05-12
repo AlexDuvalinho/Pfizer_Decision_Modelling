@@ -1,0 +1,112 @@
+Constraint : 
+- Each brick need to be assign to one and only one SR 
+
+
+Optimizations : 
+- Balance the workload 
+	--> transform this one into a constraint
+
+- Minimize the travel distance of each SR
+	--> need to find a linear formulation 
+
+- Minimize the disruption number  (= reassignement number)
+	--> these number are weighted by the index value of the reassigned brick 
+	--> make sure we are counted them twice 
+
+
+What we need to do : 
+- choose variable
+- formulate the problem as an LP
+- find all the efficient solution 
+
+
+Variables 
+
+nb_bricks
+nb_salers 
+
+Constant Pij = 1 if brick i was previously assigned to SR j 
+   	  	 0 else 
+
+Constant Dij : distance between brick i and SR office j    	  	 
+
+Constant Vi = index value of brick i 
+
+
+WHAT WE WANT TO FIND  
+Xij = 1 if brick i in assigned to SR j 
+   	0 else 
+
+
+
+Assignments constraints : 
+Sum over j Xij = 1 
+
+Workload constraints : 
+for each Sr j, 0.8 <= Sum over i of  Xij * Vi <= 1.2
+
+Disruption :
+Minimize Sum over i,j  of abs(Xij - Pij)* Vi /2 
+<=> 
+Minimize Sum over i,j of  Hij
+Under constraints :
+	- 	Hij >= Xij - Pij
+	- 	Hij >= -(Xij - Pij)
+
+Travel distance for each SR 
+Distance for SR j ,  Sum over i of Dij * Xij
+Minimize Sum over j , Sum over i  of Dij * Xij  
+
+
+
+PIPELINE :
+Sum over j Xij = 1 
+for each Sr j, 0.8 <= Sum over i of  Xij * Vi <= 1.2
+We fix an upper bount for disruption : dv 
+Sum over Hij <= dv 
+For i,j : Hij >= Xij - Pij and	Hij >= -(Xij - Pij)
+
+Minimize Sum over i,j of Dij * Xij  + espilon * Sum of Hij 
+
+
+
+QUESTION 4)
+Now Xij is a real number between 0 and 1 
+For each brick i, Sum Xij = 1 
+RELAXATION PROBELME 
+
+QUESTION 5)
+Now all the Vi value will be 1.2 * Vi 
+Xij now j goes from 0 to nb_salers + 1
+Li = 1 is new_salers if on brick i else 0
+Sum over i , Li  = 1  (the news saler has an office)
+Let call Bij, distance betweek brick i and brick j
+Then distance between new SR and brick i =
+sum over k, Lk * Bki 
+
+So distance that new SR has to do = 
+sum over, i, sum over k Xij * Lk * Bki where j is the index of the new SR
+
+
+QUESTION 6)
+New variable Wij = 1 if SR j office is located on brick i 
+For each j, sum over i Wij = 1 (each SR must have one and only one office)
+
+Now new distance constant variable Bij : is the distance between brick i and brick j 
+Let's call Mij, the distance between SR j office and brick i = (Sum over k of Wkj * Dik)
+Minimize 
+Sum over j,i Xij * Mij 
+
+QUESTION 7)
+Each SR will rank the brick he prefered as a location office 
+Let's denote Vrank_j (rank_brick1, ... rank_brickn) the vector rank for SR j
+We want to minimize Sum over j < Vrank_j, (Wj1, ... Wjn) > 
+Maybe better to take the square value (it is more fair)
+
+
+
+
+
+
+
+
